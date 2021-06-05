@@ -31,24 +31,64 @@ const ShoeCard = ({
       ? 'new-release'
       : 'default'
 
+  let ShoeComponent = null;
+  let ShoeComponentText = null;
+
+  const priceStyles = {
+    "--text-decoration-line": null,
+    "--color": `${COLORS.gray[900]}`,
+  };
+
+  if (variant === "on-sale") {
+    ShoeComponent = ShoeStatusSale;
+    ShoeComponentText = "Sale";
+    priceStyles["--text-decoration-line"] = "line-through";
+    priceStyles["--color"] = `${COLORS.gray[700]}`;
+  } else if (variant === "new-release") {
+    ShoeComponent = ShoeStatusReleased;
+    ShoeComponentText = "Just released!";
+  }
+
   return (
     <Link href={`/shoe/${slug}`}>
       <Wrapper>
         <ImageWrapper>
           <Image alt="" src={imageSrc} />
+          {ShoeComponent && <ShoeComponent>{ShoeComponentText}</ShoeComponent>}
         </ImageWrapper>
         <Spacer size={12} />
         <Row>
           <Name>{name}</Name>
-          <Price>{formatPrice(price)}</Price>
+          <Price style={priceStyles}>{formatPrice(price)}</Price>
         </Row>
         <Row>
           <ColorInfo>{pluralize("Color", numOfColors)}</ColorInfo>
+          {salePrice && <SalePrice>{formatPrice(salePrice)}</SalePrice>}
         </Row>
       </Wrapper>
     </Link>
   );
 };
+
+const ShoeStatus = styled.div`
+  position: absolute;
+  color: ${COLORS.white};
+  top: 12px;
+  right: -4px;
+  border-radius: 2px;
+  font-size: 0.875rem;
+  line-height: 16px;
+  padding: 7px 9px 9px 10px;
+  font-weight: 700;
+`;
+
+const ShoeStatusSale = styled(ShoeStatus)`
+  background-color: ${COLORS.primary};
+`;
+
+const ShoeStatusReleased = styled(ShoeStatus)`
+  background-color: ${COLORS.secondary};
+`;
 
 const Link = styled.a`
   text-decoration: none;
@@ -64,6 +104,7 @@ const ImageWrapper = styled.div`
 
 const Image = styled.img`
   width: 100%;
+  border-radius: 16px 16px 4px 4px;
 `;
 
 const Row = styled.div`
@@ -77,7 +118,10 @@ const Name = styled.h3`
   color: ${COLORS.gray[900]};
 `;
 
-const Price = styled.span``;
+const Price = styled.span`
+  text-decoration-line: var(--text-decoration-line);
+  color: var(--color);
+`;
 
 const ColorInfo = styled.p`
   color: ${COLORS.gray[700]};
